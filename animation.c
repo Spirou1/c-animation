@@ -7,33 +7,39 @@
 #define BACKGROUND_CHAR '.'
 
 
+typedef struct {
+    int x;
+    int y;
+    char symbol;
+    int color;
+} Entity;
+
+Entity player = { 0, 0, '@', 32 };
+
 char canvas[HEIGHT][WIDTH];
 
-int px = 0;
-int py = 0;
 
-void draw_point(int x, int y, char c) {
-    if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
-        canvas[y][x] = c;
+void draw_entity(Entity *e) {
+    if (e->x >= 0 && e->x < WIDTH && e->y >= 0 && e->y < HEIGHT) {
+        canvas[e->y][e->x] = e->symbol;
     }
 }
 
 void clear_canvas() {
-    for (int x = 0; x < HEIGHT; x++) {
-        for (int y = 0; y < WIDTH; y++) {
-            canvas[x][y] = BACKGROUND_CHAR;
+   for (int y = 0; y < HEIGHT; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            canvas[y][x] = BACKGROUND_CHAR;
         }
-    }
+    } 
 }
 
-
 void draw_canvas() {
-    for (int i = 0; i < HEIGHT; i++) {
-        for (int j = 0; j < WIDTH; j++) {
-            char c = canvas[i][j];
+    for (int y = 0; y < HEIGHT; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            char c = canvas[y][x];
 
-            if (c == '@') {
-                printf("\033[33m%c\033[0m", c);
+            if (c == player.symbol) {
+                printf("\033[%dm%c\033[0m", player.color, c);
             } else {
                 printf("%c", c);
             }
@@ -47,20 +53,19 @@ int main()
 {
     for (;;) {
         printf("\033[H\033[J");
-        px++;
+        player.x++;
     
 
         clear_canvas();
-        draw_point(px, py, '@');
-        if (px > WIDTH) {
-            px = 0;
-            py++;
-            if (py > HEIGHT) {
-                py = 0;
+        draw_entity(&player);
+        if (player.x >= WIDTH) {
+            player.x = 0;
+            player.y++;
+            if (player.y >= HEIGHT) {
+                player.y = 0;
             }
         }
         draw_canvas();
-
         usleep(10000);
     }
 }
